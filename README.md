@@ -32,5 +32,7 @@ callback/onpay.php -> modules/gateways/callbacks/onpay.php
 ```
 
 2: Activate the module in System Settings -> Payment Gateways
+
 3: Configure the module as per the instructions in the settings page.
+
 3.1: `Window Design` is not required, it will simply default to the normal OnPay layout.
