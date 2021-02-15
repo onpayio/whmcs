@@ -1,0 +1,17 @@
+{
+    "name": "onpayio/php-sdk",
+    "type": "library",
+    "description": "PHP SDK for OnPay.io API",
+    "homepage": "https://github.com/onpayio/php-sdk",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "OnPay\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.6",
+        "onpayio/oauth2-client": "^7.1",
+        "ext-json": "*"
+    }
+}

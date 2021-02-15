@@ -1,0 +1,6 @@
+{
+    "require": {
+        "onpayio/php-sdk": "^1.0",
+        "league/iso3166": "^3.0"
+    }
+}
