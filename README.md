@@ -5,10 +5,10 @@ This module implements the OnPay payment gateway into WHMCS.
 ### Supported features
 - Allow customer to pay using the card both for new and recurring items (reuse the card).
 - Set the payment window design from OnPay
-- Allow charging the card from WHMCS admin
+- Allow charging the card through WHMCS admin
+- Allow refunds through WHMCS admin
 
 ### TODO:
-- Implement refund functionality
 - Implement MobilePay subscriptions when OnPay supports it.
 
 ### Not implemented

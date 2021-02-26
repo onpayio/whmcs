@@ -125,6 +125,51 @@ function onpay_capture($params)
     ];
 }
 
+function onpay_refund($params)
+{
+    // We get our gateway settings here
+    $apiKey = $params['apiKey'];
+
+    // Transaction Parameters
+    $transactionIdToRefund = $params['transid'];
+    $refundAmount = $params['amount'];
+    $gatewayAmount = $refundAmount * 100;
+
+    // System Parameters
+    $systemUrl = $params['systemurl'];
+
+    // Set up the OnPayAPI to do further transactions
+    $staticToken = new StaticToken($apiKey);
+    $onPayAPI = new OnPayAPI($staticToken, [
+        'client_id' => $systemUrl,
+    ]);
+
+    try {
+        $refundResult = $onPayAPI->transaction()->refundTransaction($transactionIdToRefund, (int)$gatewayAmount);
+    } catch(\OnPay\API\Exception\ApiException $e) {
+        return [
+            'status' => 'declined',
+            'declinereason' => $e->getMessage(),
+            'rawdata' => $e->getMessage(),
+        ];
+    }
+
+    if(in_array($refundResult->status, ['finished', 'refunded'])) {
+        return [
+            'status' => 'success',
+            'transid' => $refundResult->transactionNumber,
+            'fee' => 0,
+            'rawdata' => (array) $refundResult,
+        ];
+    }
+
+    return [
+        'status' => 'declined',
+        'declinereason' => (array) $refundResult,
+        'rawdata' => (array) $refundResult,
+    ];
+}
+
 // This generates the actual payment link on the invoice
 function onpay_link($params)
 {
