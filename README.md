@@ -31,8 +31,10 @@ onpay -> modules/gateways/onpay
 callback/onpay.php -> modules/gateways/callbacks/onpay.php
 ```
 
-2: Activate the module in System Settings -> Payment Gateways
+2: Language files can be found in `lang/overrides`, and can be copied/merged to the corresponding `lang/overrides` directory in WHMCS.
 
-3: Configure the module as per the instructions in the settings page.
+3: Activate the module in System Settings -> Payment Gateways
 
-3.1: `Window Design` is not required, it will simply default to the normal OnPay layout.
+4: Configure the module as per the instructions in the settings page.
+
+4.1: `Window Design` is not required, it will simply default to the normal OnPay layout.

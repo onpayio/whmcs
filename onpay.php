@@ -280,6 +280,7 @@ function onpay_link($params)
     if($paymentWindow->isValid()) {
         $return_output = "";
         if($onPayPayMethods > 0) {
+            $payNow = Lang::trans("onpay_pay_now");
             $return_output .= <<<EOT
             <form class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
@@ -293,7 +294,7 @@ function onpay_link($params)
                         $payMethodData
                     </select>
                     <div class="input-group-btn input-group-append">
-                        <input class="btn btn-success" type="submit" value="Pay" />
+                        <input class="btn btn-success" type="submit" value="$payNow" />
                     </div>
                 </div>
             </form>
@@ -310,7 +311,7 @@ function onpay_link($params)
             $return_output .= "<input type='hidden' name='$key' value='$value' />";
         }
         $return_output .= "<input type='hidden' name='opg_hmac_sha1' value='$additionalInfoHmac' />";
-        $return_output .= "<input class='btn btn-success' type='submit' value='Use New Card'></form>";
+        $return_output .= "<input class='btn btn-success' type='submit' value='" . Lang::trans('onpay_use_new_card') . "'></form>";
 
         return $return_output;
     } else {
