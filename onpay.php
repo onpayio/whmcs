@@ -245,7 +245,7 @@ function onpay_link($params)
     $paymentInfo->setBillingAddressCity($city);
     $paymentInfo->setBillingAddressCountry($country_numeric['numeric']);
     $paymentInfo->setBillingAddressLine1($address1);
-    $paymentInfo->setBillingAddressPostalCode($postcode);
+    $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
     $paymentInfo->setName($fullname);
     $paymentInfo->setEmail($email);
     $paymentInfo->setDeliveryEmail($email);
