@@ -206,6 +206,7 @@ function onpay_link($params)
     $country_numeric = (new ISO3166)->alpha2($country);
     $phone = $params['clientdetails']['phonenumber'];
     $phone_cc = $params['clientdetails']['phonecc'];
+    $lang = $_SESSION['Language']; 
 
     // System Parameters
     $companyName = $params['companyname'];
@@ -216,6 +217,7 @@ function onpay_link($params)
     // Set generic variables
     $callbackUrl = $systemUrl . 'modules/gateways/callback/' . $moduleName . '.php';
     $chargeUrl = $systemUrl . 'modules/gateways/' . $moduleName . '/' . $moduleName . '.php';
+    $set_lang  = array('danish' => 'da', 'english' => 'en'); 
 
     $paymentWindow = new PaymentWindow();
     // Generic gateway settings
@@ -238,6 +240,7 @@ function onpay_link($params)
     $paymentWindow->setAcceptUrl($returnUrl . "&paymentsuccessawaitingnotification=true");
     $paymentWindow->setDeclineUrl($returnUrl . "&paymentfailed=true");
     $paymentWindow->setCallbackUrl($callbackUrl);
+    $paymentWindow->setLanguage($set_lang[$lang]);
 
     // Set customer related variables for SCA
     $paymentInfo = new PaymentWindow\PaymentInfo();
@@ -285,6 +288,7 @@ function onpay_link($params)
             <form class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
                 <input type="hidden" name="opg_user_id" value="$clientId" />
+                <input type="hidden" name="opg_language" value="da" />
                 <input type="hidden" name="opg_amount" value="$gatewayAmount" />
                 <input type="hidden" name="opg_invoice_id" value="$invoiceId" />
                 <input type="hidden" name="opg_invoice_number" value="$invoiceNumber" />
