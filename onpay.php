@@ -217,7 +217,7 @@ function onpay_link($params)
     // Set generic variables
     $callbackUrl = $systemUrl . 'modules/gateways/callback/' . $moduleName . '.php';
     $chargeUrl = $systemUrl . 'modules/gateways/' . $moduleName . '/' . $moduleName . '.php';
-    $set_lang  = array('danish' => 'da', 'english' => 'en'); 
+    $set_lang  = array('danish' => 'da', 'english' => 'en', 'german' => 'de', 'swedish' => 'sv', 'french' => 'fr'); 
 
     $paymentWindow = new PaymentWindow();
     // Generic gateway settings
