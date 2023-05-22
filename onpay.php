@@ -288,7 +288,6 @@ function onpay_link($params)
             <form class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
                 <input type="hidden" name="opg_user_id" value="$clientId" />
-                <input type="hidden" name="opg_language" value="da" />
                 <input type="hidden" name="opg_amount" value="$gatewayAmount" />
                 <input type="hidden" name="opg_invoice_id" value="$invoiceId" />
                 <input type="hidden" name="opg_invoice_number" value="$invoiceNumber" />
