@@ -7,6 +7,7 @@ App::load_function('gateway');
 App::load_function('invoice');
 
 use \OnPay\API\PaymentWindow;
+use \OnPay\API\Util\Currency;
 use \OnPay\StaticToken;
 use WHMCS\Database\Capsule;
 
@@ -27,10 +28,15 @@ $onpayCurrency = $_GET['onpay_currency'];
 $onpayMethod = $_GET['onpay_method'];
 $invoiceId = $_GET['opg_invoice_id'];
 
+// onpay_currency is ISO 4217 currency code (e.g. 208 for DKK, 978 for EUR, 840 for USD) so we need to convert it to the 3 letter code.
+$onpayCurrency = new Currency((int)$_GET['onpay_currency']);
+
+$onpayCurrencyAlpha3 = $onpayCurrency->getAlpha3();
+
 // We get our gateway settings here
-$gatewayId = $gatewayParams['gatewayID'];
-$windowSecret = $gatewayParams['windowSecret'];
-$apiKey = $gatewayParams['apiKey'];
+$gatewayId = _determineValue($gatewayParams['gatewayID'], $onpayCurrencyAlpha3);
+$windowSecret = _determineValue($gatewayParams['windowSecret'], $onpayCurrencyAlpha3);
+$apiKey = _determineValue($gatewayParams['apiKey'], $onpayCurrencyAlpha3);
 $systemUrl = $gatewayParams['systemurl'];
 $sandboxValue = $gatewayParams['sandboxMode'];
 $sandboxMode = 0;

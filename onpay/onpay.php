@@ -21,10 +21,12 @@ if (!$gatewayParams['type']) {
     die("Module Not Activated");
 }
 
+$currency = $_POST['opg_currency'];
+
 // We get our gateway settings here
-$gatewayId = $gatewayParams['gatewayID'];
-$windowSecret = $gatewayParams['windowSecret'];
-$apiKey = $gatewayParams['apiKey'];
+$gatewayId = _determineValue($gatewayParams['gatewayID'], $currency);
+$windowSecret = _determineValue($gatewayParams['windowSecret'], $currency);
+$apiKey = _determineValue($gatewayParams['apiKey'], $currency);
 $systemUrl = $gatewayParams['systemurl'];
 $sandboxValue = $gatewayParams['sandboxMode'];
 $sandboxMode = 0;
@@ -32,6 +34,7 @@ if($sandboxValue == "on")
 {
     $sandboxMode = 1;
 }
+
 // Set up the payment Window for validating the payment
 $payment = new PaymentWindow();
 $payment->setSecret($windowSecret);
