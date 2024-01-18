@@ -86,7 +86,8 @@ if($payMethod['result'] == 'success' && count($payMethod['paymethods']) == 1) {
     } catch (\Exception $e) {
         $errorData = [
             (array)$e->getMessage(),
-            $_POST,
+	    $_POST,
+	    $paymentResult,
         ];
         logTransaction($gatewayParams['name'], $errorData, 'Failure');
         sendMessage("Credit Card Payment Failed", $invoiceId);

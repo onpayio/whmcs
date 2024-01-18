@@ -243,7 +243,7 @@ function onpay_link($params)
     $paymentInfo->setBillingAddressCity($city);
     $paymentInfo->setBillingAddressCountry($country_numeric['numeric']);
     $paymentInfo->setBillingAddressLine1($address1);
-    $paymentInfo->setBillingAddressPostalCode($postcode);
+    $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
     $paymentInfo->setName($fullname);
     $paymentInfo->setEmail($email);
     $paymentInfo->setDeliveryEmail($email);
@@ -262,7 +262,7 @@ function onpay_link($params)
     $payMethodData = '';
     foreach($payMethods['paymethods'] as $payMethod) {
         if($payMethod['gateway_name'] == $moduleName) {
-            $payMethodData .= "<option value='${payMethod['id']}'>************${payMethod['card_last_four']} ${payMethod['expiry_date']}</option>";
+            $payMethodData .= "<option value='{$payMethod['id']}'>************{$payMethod['card_last_four']} {$payMethod['expiry_date']}</option>";
             $onPayPayMethods++;
         }
     }
@@ -281,7 +281,7 @@ function onpay_link($params)
         if($onPayPayMethods > 0) {
             $payNow = Lang::trans("onpay_pay_now");
             $return_output .= <<<EOT
-            <form class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
+            <form id="onpayform" class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
                 <input type="hidden" name="opg_user_id" value="$clientId" />
                 <input type="hidden" name="opg_amount" value="$gatewayAmount" />
@@ -298,8 +298,14 @@ function onpay_link($params)
                     </div>
                 </div>
             </form>
+            <script>
+            $('#onpayform').submit(function(){
+                $('input[type=submit]', this).prop('value', 'Paying...');
+                $('input[type=submit]', this).attr('disabled', 'disabled');
+            });
+            </script>
             <hr />
- EOT;
+EOT;
         }
         $return_output .= "<form method='post' action='{$paymentWindow->getActionUrl()}' accept-charset='UTF-8'>";
         foreach($paymentWindow->getFormFields() as $key => $value) {

@@ -9,7 +9,6 @@ App::load_function('invoice');
 use \OnPay\API\PaymentWindow;
 use \OnPay\API\Util\Currency;
 use \OnPay\StaticToken;
-use WHMCS\Database\Capsule;
 
 // Detect module name from filename.
 $gatewayModuleName = basename(__FILE__, '.php');
