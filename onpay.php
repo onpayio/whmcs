@@ -36,28 +36,28 @@ function onpay_config()
             'Type' => 'text',
             'Size' => '25',
             'Default' => '',
-            'Description' => 'Enter your gateway ID here',
+            'Description' => 'Enter your gateway ID here. Can be set per currency. Check the README.md for more information.',
         ],
         'windowDesign' => [
             'FriendlyName' => 'Window Design',
             'Type' => 'text',
             'Size' => '25',
             'Default' => null,
-            'Description' => 'Enter the Window Design name here for controlling the payment window layout.',
+            'Description' => 'Enter the Window Design name here for controlling the payment window layout. Can be set per currency. Check the README.md for more information.',
         ],
         'windowSecret' => [
             'FriendlyName' => 'Window Secret',
             'Type' => 'password',
             'Size' => '25',
             'Default' => '',
-            'Description' => 'Enter the Window Secret here. You can find this key by going to https://manage.onpay.io/ -> Settings -> Payment Window',
+            'Description' => 'Enter the Window Secret here. You can find this key by going to https://manage.onpay.io/ -> Settings -> Payment Window. Can be set per currency. Check the README.md for more information.',
         ],
         'apiKey' => [
             'FriendlyName' => 'API Key',
             'Type' => 'password',
             'Size' => '25',
             'Default' => '',
-            'Description' => 'Enter an API Key here. You can generate such key from https://manage.onpay.io/ -> Settings -> API',
+            'Description' => 'Enter an API Key here. You can generate such key from https://manage.onpay.io/ -> Settings -> API. Can be set per currency. Check the README.md for more information.',
         ],
         'sandboxMode' => [
             'FriendlyName' => 'SandBox Mode',
@@ -72,16 +72,11 @@ function onpay_nolocalcc() {}
 // The onpay_capture function is only used for allowing charges as an admin
 function onpay_capture($params)
 {
+
+    $currencyCode = $params['currency'];
+
     // We get our gateway settings here
-    $gatewayId = $params['gatewayID'];
-    $windowSecret = $params['windowSecret'];
-    $apiKey = $params['apiKey'];
-    $sandboxValue = $params['sandboxMode'];
-    $sandboxMode = 0;
-    if($sandboxValue == "on")
-    {
-        $sandboxMode = 1;
-    }
+    $apiKey = _determineValue($params['apiKey'], $currencyCode);
 
     // Capture Parameters
     $remoteGatewayToken = $params['gatewayid'];
@@ -127,8 +122,10 @@ function onpay_capture($params)
 
 function onpay_refund($params)
 {
+
+    $currencyCode = $params['currency'];
     // We get our gateway settings here
-    $apiKey = $params['apiKey'];
+    $apiKey = _determineValue($params['apiKey'], $currencyCode);
 
     // Transaction Parameters
     $transactionIdToRefund = $params['transid'];
@@ -173,11 +170,13 @@ function onpay_refund($params)
 // This generates the actual payment link on the invoice
 function onpay_link($params)
 {
+    $currencyCode = $params['currency'];
     // We get our gateway settings here
-    $gatewayId = $params['gatewayID'];
-    $windowSecret = $params['windowSecret'];
-    $windowDesign = $params['windowDesign'];
-    $apiKey = $params['apiKey'];
+    $gatewayId = _determineValue($params['gatewayID'], $currencyCode);
+    $windowSecret = _determineValue($params['windowSecret'], $currencyCode);
+    $windowDesign = _determineValue($params['windowDesign'], $currencyCode);
+    $apiKey = _determineValue($params['apiKey'], $currencyCode);
+
     $sandboxValue = $params['sandboxMode'];
     $sandboxMode = 0;
     if($sandboxValue == "on")
@@ -189,18 +188,14 @@ function onpay_link($params)
     $invoiceId = $params['invoiceid'];
     $invoiceNumber = $params['invoicenum'];
     $amount = $params['amount'];
-    $currencyCode = $params['currency'];
 
     // Client Parameters
     $clientId = $params['clientdetails']['client_id'];
-    $firstname = $params['clientdetails']['firstname'];
-    $lastname = $params['clientdetails']['lastname'];
     $fullname = $params['clientdetails']['fullname'];
     $email = $params['clientdetails']['email'];
     $address1 = $params['clientdetails']['address1'];
     $address2 = $params['clientdetails']['address2'];
     $city = $params['clientdetails']['city'];
-    $state = $params['clientdetails']['state'];
     $postcode = $params['clientdetails']['postcode'];
     $country = $params['clientdetails']['country'];
     $country_numeric = (new ISO3166)->alpha2($country);
@@ -242,14 +237,27 @@ function onpay_link($params)
     // Set customer related variables for SCA
     $paymentInfo = new PaymentWindow\PaymentInfo();
     $paymentInfo->setAccountId($clientId);
-    $paymentInfo->setBillingAddressCity($city);
     $paymentInfo->setBillingAddressCountry($country_numeric['numeric']);
-    $paymentInfo->setBillingAddressLine1($address1);
-    $paymentInfo->setBillingAddressPostalCode($postcode);
-    $paymentInfo->setName($fullname);
+    if(!empty(trim($city))) {
+        $paymentInfo->setBillingAddressCity($city);
+    }
+    if(!empty(trim($address1))) {
+        $paymentInfo->setBillingAddressLine1($address1);
+    }
+    if(!empty(trim($address2))) {
+        $paymentInfo->setBillingAddressLine2($address2);
+    }
+    if(!empty(trim($postcode))) {
+        $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
+    }
+    if(!empty(trim($fullname))) {
+        $paymentInfo->setName($fullname);
+    }
+    if(!empty(trim($phone))) {
+        $paymentInfo->setPhoneHome($phone_cc, $phone);
+    }
     $paymentInfo->setEmail($email);
     $paymentInfo->setDeliveryEmail($email);
-    $paymentInfo->setPhoneHome($phone_cc, $phone);
     // Electronic delivery
     $paymentInfo->setDeliveryTimeFrame("01");
     $paymentInfo->setShippingMethod("07");
@@ -264,7 +272,7 @@ function onpay_link($params)
     $payMethodData = '';
     foreach($payMethods['paymethods'] as $payMethod) {
         if($payMethod['gateway_name'] == $moduleName) {
-            $payMethodData .= "<option value='${payMethod['id']}'>************${payMethod['card_last_four']} ${payMethod['expiry_date']}</option>";
+            $payMethodData .= "<option value='{$payMethod['id']}'>************{$payMethod['card_last_four']} {$payMethod['expiry_date']}</option>";
             $onPayPayMethods++;
         }
     }
@@ -274,6 +282,7 @@ function onpay_link($params)
         'opg_amount' => $gatewayAmount,
         'opg_invoice_id' => $invoiceId,
         'opg_invoice_number' => $invoiceNumber,
+        'opg_currency' => $currencyCode,
     ];
 
     $additionalInfoHmac = _calculateInternalSecret($additionalInfo, $windowSecret);
@@ -282,12 +291,13 @@ function onpay_link($params)
         if($onPayPayMethods > 0) {
             $payNow = Lang::trans("onpay_pay_now");
             $return_output .= <<<EOT
-            <form class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
+            <form id="onpayform" class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
                 <input type="hidden" name="opg_user_id" value="$clientId" />
                 <input type="hidden" name="opg_amount" value="$gatewayAmount" />
                 <input type="hidden" name="opg_invoice_id" value="$invoiceId" />
                 <input type="hidden" name="opg_invoice_number" value="$invoiceNumber" />
+                <input type="hidden" name="opg_currency" value="$currencyCode" />
                 <input type='hidden' name='opg_hmac_sha1' value='$additionalInfoHmac' />
                 <div class="input-group">
                     <select class="form-control" name="cardid">
@@ -298,8 +308,14 @@ function onpay_link($params)
                     </div>
                 </div>
             </form>
+            <script>
+            $('#onpayform').submit(function(){
+                $('input[type=submit]', this).prop('value', 'Paying...');
+                $('input[type=submit]', this).attr('disabled', 'disabled');
+            });
+            </script>
             <hr />
- EOT;
+EOT;
         }
         $return_output .= "<form method='post' action='{$paymentWindow->getActionUrl()}' accept-charset='UTF-8'>";
         foreach($paymentWindow->getFormFields() as $key => $value) {
@@ -335,6 +351,40 @@ function _calculateInternalSecret(array $params, $secret)
 
     return $hmac;
 }
+
+function _determineValue($value, $currencyCode)
+{
+    $valueParts = explode(',', $value);
+    $result = null;
+
+    foreach ($valueParts as $valuePart) {
+        $valuePartParts = explode(':', $valuePart);
+        if (count($valuePartParts) == 2) {
+            $key = $valuePartParts[0];
+            $value = $valuePartParts[1];
+
+            if ($key === $currencyCode) {
+                $result = $value;
+                break;
+            } elseif ($key === 'DEFAULT') {
+                $result = $value;
+            }
+        }
+    }
+
+    if (!$result) {
+        $result = $valueParts[0];
+    }
+
+    // Split by ':' and use the number if the result contains ':'
+    if (strpos($result, ':') !== false) {
+        $resultParts = explode(':', $result);
+        $result = $resultParts[1];
+    }
+
+    return $result;
+}
+
 // This allows us to use the awaiting notification endpoint on invoices
 add_hook('ClientAreaPageViewInvoice', 1, function($vars) {
     $gatewayModuleName = basename(__FILE__, '.php');
