@@ -191,14 +191,11 @@ function onpay_link($params)
 
     // Client Parameters
     $clientId = $params['clientdetails']['client_id'];
-    $firstname = $params['clientdetails']['firstname'];
-    $lastname = $params['clientdetails']['lastname'];
     $fullname = $params['clientdetails']['fullname'];
     $email = $params['clientdetails']['email'];
     $address1 = $params['clientdetails']['address1'];
     $address2 = $params['clientdetails']['address2'];
     $city = $params['clientdetails']['city'];
-    $state = $params['clientdetails']['state'];
     $postcode = $params['clientdetails']['postcode'];
     $country = $params['clientdetails']['country'];
     $country_numeric = (new ISO3166)->alpha2($country);
@@ -240,14 +237,27 @@ function onpay_link($params)
     // Set customer related variables for SCA
     $paymentInfo = new PaymentWindow\PaymentInfo();
     $paymentInfo->setAccountId($clientId);
-    $paymentInfo->setBillingAddressCity($city);
     $paymentInfo->setBillingAddressCountry($country_numeric['numeric']);
-    $paymentInfo->setBillingAddressLine1($address1);
-    $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
-    $paymentInfo->setName($fullname);
+    if(!empty(trim($city))) {
+        $paymentInfo->setBillingAddressCity($city);
+    }
+    if(!empty(trim($address1))) {
+        $paymentInfo->setBillingAddressLine1($address1);
+    }
+    if(!empty(trim($address2))) {
+        $paymentInfo->setBillingAddressLine2($address2);
+    }
+    if(!empty(trim($postcode))) {
+        $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
+    }
+    if(!empty(trim($fullname))) {
+        $paymentInfo->setName($fullname);
+    }
+    if(!empty(trim($phone))) {
+        $paymentInfo->setPhoneHome($phone_cc, $phone);
+    }
     $paymentInfo->setEmail($email);
     $paymentInfo->setDeliveryEmail($email);
-    $paymentInfo->setPhoneHome($phone_cc, $phone);
     // Electronic delivery
     $paymentInfo->setDeliveryTimeFrame("01");
     $paymentInfo->setShippingMethod("07");
