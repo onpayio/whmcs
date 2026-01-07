@@ -30,6 +30,7 @@ This module implements the OnPay payment gateway into WHMCS.
 onpay.php -> modules/gateways/onpay.php
 onpay -> modules/gateways/onpay
 callback/onpay.php -> modules/gateways/callbacks/onpay.php
+hooks/onpay_address_length.php -> includes/hooks/onpay_address_length.php
 ```
 
 2: Language files can be found in `lang/overrides`, and can be copied/merged to the corresponding `lang/overrides` directory in WHMCS.

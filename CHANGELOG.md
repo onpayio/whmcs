@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Added SECURITY.md
+- Use trimmed valued for SCA
+- Introduce hook that enforces address lengths on `address1` and `address2` fields to 50 characters both client-side and server-side in WHMCS
+- Set the website when generating the payment window since this is required for Apple Pay.
 
 ## [1.3.0] - 2023-01-30
 - Add support for defining settings for multiple currencies (e.g. change `gatewayID`, `windowSecret`, `windowDesign` and `apiKey`)
