@@ -230,6 +230,7 @@ function onpay_link($params)
     $paymentWindow->setCurrency($currencyCode);
     $paymentWindow->setAmount($gatewayAmount);
     $paymentWindow->setReference($invoiceNumber);
+    $paymentWindow->setWebsite($returnUrl);
     $paymentWindow->setAcceptUrl($returnUrl . "&paymentsuccessawaitingnotification=true");
     $paymentWindow->setDeclineUrl($returnUrl . "&paymentfailed=true");
     $paymentWindow->setCallbackUrl($callbackUrl);
@@ -239,22 +240,22 @@ function onpay_link($params)
     $paymentInfo->setAccountId($clientId);
     $paymentInfo->setBillingAddressCountry($country_numeric['numeric']);
     if(!empty(trim($city))) {
-        $paymentInfo->setBillingAddressCity($city);
+        $paymentInfo->setBillingAddressCity(trim($city));
     }
     if(!empty(trim($address1))) {
-        $paymentInfo->setBillingAddressLine1($address1);
+        $paymentInfo->setBillingAddressLine1(trim($address1));
     }
     if(!empty(trim($address2))) {
-        $paymentInfo->setBillingAddressLine2($address2);
+        $paymentInfo->setBillingAddressLine2(trim($address2));
     }
     if(!empty(trim($postcode))) {
-        $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', $postcode));
+        $paymentInfo->setBillingAddressPostalCode(str_replace(' ', '', trim($postcode)));
     }
     if(!empty(trim($fullname))) {
-        $paymentInfo->setName($fullname);
+        $paymentInfo->setName(trim($fullname));
     }
     if(!empty(trim($phone))) {
-        $paymentInfo->setPhoneHome($phone_cc, $phone);
+        $paymentInfo->setPhoneHome($phone_cc, trim($phone));
     }
     $paymentInfo->setEmail($email);
     $paymentInfo->setDeliveryEmail($email);
@@ -289,7 +290,7 @@ function onpay_link($params)
     if($paymentWindow->isValid()) {
         $return_output = "";
         if($onPayPayMethods > 0) {
-            $payNow = Lang::trans("onpay_pay_now");
+            $payNow = Lang::trans('onpay_pay_now');
             $return_output .= <<<EOT
             <form id="onpayform" class="form-inline mb-3 justify-content-center" method="post" action="$chargeUrl">
                 <input type="hidden" name="returnUrl" value="$returnUrl" />
